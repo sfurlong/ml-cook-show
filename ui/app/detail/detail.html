@@ -1,0 +1,85 @@
+<div class="row detail" data-ng-if="!model.detail.latitude || !model.detail.longitude">
+  <div class="panel panel-default">
+    <div class="panel-heading">Data</div>
+    <div class="panel-body">
+      <div ng-repeat="result in model.detail._children">
+        <div ng-repeat="(key,value) in result">{{key}} :
+          <span ng-if="key !== 'member'">{{value._children[0]}}</span>
+          <span ng-if="key === 'member'">
+            <div ng-repeat="memField in value._children" class="detail-child">
+              <div ng-repeat="(key2,value2) in memField">{{key2}} :
+                <span>{{value2._children[0]}}</span>
+              </div>
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row detail" data-ng-if="model.detail.latitude && model.detail.longitude">
+  <div class="col-sm-8">
+    <div class="panel panel-default">
+      <div class="panel-heading">Data</div>
+      <div class="panel-body">
+        <div ng-repeat="result in model.detail._children">
+          <div ng-repeat="(key,value) in result">{{key}} :
+            <span ng-if="key !== 'member'">{{value._children[0]}}</span>
+            <span ng-if="key === 'member'">
+              <div ng-repeat="memField in value._children" class="detail-child">
+                <div ng-repeat="(key2,value2) in memField">{{key2}} :
+                  <span>{{value2._children[0]}}</span>
+                </div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <!-- display data on ESRI Map -->
+    <div class="panel panel-default">
+      <div class="panel-heading">Map</div>
+      <div class="panel-body">
+        <esri-map detail="model.detail" container-id="detailMap"></esri-map>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--
+<div class="row detail">
+  <div ng-repeat="result in model.detail.root._children">
+    <div ng-repeat="(key,value) in result">{{key}} :
+      <span ng-if="key !== 'member'">{{value._children[0]}}</span>
+      <span ng-if="key === 'member'">
+        <div ng-repeat="memField in value._children" class="detail-child">
+          <div ng-repeat="(key2,value2) in memField">{{key2}} :
+            <span>{{value2._children[0]}}</span>
+          </div>
+        </div>
+      </span>
+    </div>
+  </div>
+
+  <div ng-repeat="result in model.detail.member._children">
+    <div ng-repeat="(key,value) in result">{{key}} :
+      <span ng-if="key !== 'member'">{{value._children[0]}}</span>
+      <span ng-if="key === 'member'">
+        <div ng-repeat="memField in value._children" class="detail-child">
+          <div ng-repeat="(key2,value2) in memField">{{key2}} :
+            <span>{{value2._children[0]}}</span>
+          </div>
+        </div>
+      </span>
+    </div>
+  </div>
+</div>
+-->
+
+
+
+<!-- <div class="detail" ng-show="model.detail" compile="model.detail"></div> -->

@@ -1,0 +1,48 @@
+<h1>SQL Explorer</h1>
+<div>
+  <form class="form-horizontal">
+    <div class="form-group">
+      <h2>Tables</h2>
+      <div>
+        <button type="button" class="btn btn-primary table-btn" ng-repeat="table in model.tables" ng-click="loadTableData(table)">{{table}}</button>
+      </div>
+    </div>
+    <div class="row">
+      <hr/>
+    </div>
+    <div class="row" ng-if="model.tableName">
+      <h2><span class="label label-default">{{model.tableName}}</span></h2>
+    </div>
+    <tabset>
+      <tab heading="Description">
+        <div class="row panel panel-default">
+          <table class="sql-results table">
+            <tr>
+              <th ng-repeat="hdr in model.tableDescribeHdrs">{{hdr}}</th>
+            </tr>
+            <tr ng-repeat="row in model.tableDescribeResults">
+              <td ng-repeat="field in row.tuple._children">
+                <span ng-repeat="(key,value) in field">{{value._children[0]}}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </tab>
+      <tab>
+        <tab-heading>Data <span class="badge">{{model.tableCount | number}}</span></tab-heading>
+        <div class="row panel panel-default">
+          <table class="sql-results table">
+            <tr>
+              <th ng-repeat="hdr in model.tableSelectHdrs">{{hdr}}</th>
+            </tr>
+            <tr ng-repeat="row in model.tableSelectResults">
+              <td ng-repeat="field in row.tuple._children">
+                <span ng-repeat="(key,value) in field">{{value._children[0]}}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </tab>
+    </tabset>
+  </form>
+</div>

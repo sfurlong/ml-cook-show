@@ -1,0 +1,106 @@
+<export><workspace name="CookingShowClaims"><query name="Load Feeds" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+declare namespace local = "http://pete.com";
+
+(: get feed from feedlist, parse feed, load :) 
+
+declare function local:monthStr-to-number ( $dateStr as xs:string ) {
+   let $months :=  ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
+   let $idx := fn:index-of($months,$dateStr)
+   return if ($idx&lt;10) then fn:concat("0", $idx) else $idx 
+};
+ 
+(: let $feed-file-path := "C:\ContentPump7\load\claims\feeds.xml" :)
+let $feed-file-path := "/vagrant/data/feeds.xml"
+let $feed-doc := xdmp:document-get($feed-file-path) 
+
+for $feed in ($feed-doc/feeds/feed)
+   let $feed-uri := string($feed)
+   let $feed-name := substring-before(fn:tokenize($feed-uri, "/")[fn:last()], ".xml")
+   let $feed :=  xdmp:http-get($feed-uri, ())[2]
+   
+   for $item in $feed//item
+      let $doc-uri := fn:concat("/article-feed/" , $feed-name , "/", string($item/guid),".xml")
+      let $date-pts := fn:tokenize( string($item/pubDate), " ") 
+      let $dateTime := xs:dateTime(xs:date( fn:concat($date-pts[4],"-",local:monthStr-to-number($date-pts[3]),"-",$date-pts[2])))
+      let $modPubDate := element modPubDate {$dateTime}
+      let $type := element type {"feed"}
+      let $doc := element doc {$item/*, $modPubDate, $type } 
+      return xdmp:document-insert($doc-uri, $doc,(),"feeds")</query><query name="http-get" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+
+xdmp:http-get("http://www.wikipedia.org")[2]/text()</query><query name="collection-delete" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+xdmp:collection-delete("feeds")</query><query name="cts-highlight" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+let $x := fn:doc("/article-feed/bodyaches/http://www.medicalnewstoday.com/releases/218095.php.xml")
+return cts:highlight($x, "arthritis", &lt;ENRICHED&gt;{$cts:text}&lt;/ENRICHED&gt;)
+
+(:MBR_ID, MEMBER_ID, --&gt; M_ID:)</query><query name="SQL" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+(:without format option, output is JSON friendly XML :)
+xdmp:sql("select distinct pharm_desc1 from test", "format")</query><query name="fn:doc" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+fn:doc("/article-feed/bodyaches/http://www.medicalnewstoday.com/releases/218095.php.xml")</query><query name="SQL-2" focus="false" active="true" mode="sql">select * from test 
+
+/*
+where mbr_age = "37"
+*/
+/*
+and test match 'morphine';
+*/</query><query name="SQL-json" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+xdmp:to-json(xdmp:sql("select distinct pharm_desc1 from test", "array"))
+
+
+
+</query><query name="get by mbr id" focus="false" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+cts:search(
+  collection("csv")/root,
+  cts:element-query(xs:QName("ANON_MBR_ID"), "GEXMLOLWF5JJXOGA")
+)
+</query><query name="MLSAM Query" focus="false" active="false" mode="xquery">import module namespace sql = "http://xqdev.com/sql" at "lib/sql.xqy";
+
+sql:execute("select * from member",
+            "http://localhost:8080/mlsql/", ())</query><query name="Load MySQL" focus="true" active="true" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+import module namespace sql = "http://xqdev.com/sql" at "lib/sql.xqy";
+
+(:
+ Converts date formatted liked [2015-04-03 12:20:32.0] to [2015-04-03T12:20:32].
+:)
+declare function local:date-str-to-datetime ( $dateStr as xs:string ) {
+   let $mod := replace($dateStr, "^(\d{4}-\d{2}-\d{2}) ", "$1T")
+   let $mod := replace($mod, "\\.0", "")
+   return $mod
+};
+
+declare function local:update-claims( $member ) {
+  let $claims := cts:search(
+    collection("csv"),
+    cts:element-query(xs:QName("ANON_MBR_ID"), $member/id/text())
+  )
+
+  return
+    for $rec in ($claims)
+    let $uri := fn:document-uri($rec)
+    return xdmp:node-insert-after($rec/root/ANON_MBR_ID, $member)
+};
+
+let $sql-data := sql:execute("select * from member", "http://localhost:8080/mlsql/", ())
+let $members :=  
+  for $sql-tuple in ($sql-data//sql:tuple)
+  let $uri := fn:concat("/mysql/member/", string($sql-tuple/id),".xml")
+  let $mod-date := xs:dateTime( local:date-str-to-datetime($sql-tuple/lastMod/text()) )
+  let $mod-elem := &lt;modDate&gt;{$mod-date}&lt;/modDate&gt;
+  let $member := &lt;member&gt;{$sql-tuple/*[name() != 'lastMod'], $mod-elem}&lt;/member&gt;
+  
+  (: Add the member data to the &lt;members&gt; collection :)
+  let $_ := xdmp:document-insert($uri, $member,(),"members")
+  
+  (: Update claims that reference this member. :)
+  return local:update-claims( $member )
+  
+return $members</query><query name="Query 2" focus="false" active="false" mode="xquery">xquery version "1.0-ml";
+declare namespace html = "http://www.w3.org/1999/xhtml";
+collection("members")</query></workspace></export>

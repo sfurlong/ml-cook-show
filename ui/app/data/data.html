@@ -1,0 +1,102 @@
+<div class="row"><h1>Data Details</h1></div>
+<div class="row">
+  <hr/>
+  <h3>Medical Feeds</h3>
+  <p>
+    The RSS feeds of <a href="http://www.medicalnewstoday.com/rss/">Medical News Today</a> are used
+    to retreive medical information headlines.  There are 126 RSS feed categories consumed from this source.
+  </p>
+  <p>
+    Each RSS headline includes the following fields:
+    <ul>
+      <li>Title</li>
+      <li>Published Date</li>
+      <li>Link</li>
+      <li>GUID</li>
+      <li>Description</li>
+      <li>Category</li>
+      <li>Modified Published Date</li>
+    </ul>
+  </p>
+  <p>
+    <button type="button" class="btn btn-primary" ng-click="loadMedicalNews()">Load RSS Feeds</button>
+    <span class="alert alert-info" role="alert" ng-if="model.medNews.loadRunning">{{model.medNews.status}}</span>
+    <span class="alert alert-success" role="alert" ng-if="model.medNews.loadSucceeded">{{model.medNews.status}}</span>
+    <span class="alert alert-danger" role="alert" ng-if="model.medNews.loadFailed">{{model.medNews.status}}</span>
+  </p>
+</div>
+<div class="row">
+  <hr/>
+  <h3>Claims Data</h3>
+  <p>
+    Claims data is stored in a CSV file that looks like an export from a relational database.  This information is
+    structured.  The data is anonymized patients claim records which includes patient age, drugs prescribed,
+    dates patient was seen, anonymous member id, anonymous pharmacy id, anonymous physician id, anonymous prescriber id,
+    etc.
+  </p>
+  <p>
+    This CSV file can be imported into MarkLogic using MarkLogic Content Pump (MLCP) or using the button below.
+  </p>
+  <p>
+    <button type="button" class="btn btn-primary" ng-click="loadClaims()">Load Claims</button>
+    <span class="alert alert-info" role="alert" ng-if="model.claims.loadRunning">{{model.claims.status}}</span>
+    <span class="alert alert-success" role="alert" ng-if="model.claims.loadSucceeded">{{model.claims.status}}</span>
+    <span class="alert alert-danger" role="alert" ng-if="model.claims.loadFailed">{{model.claims.status}}</span>
+  </p>
+</div>
+<div class="row">
+  <hr/>
+  <h3>Member Data</h3>
+  <p>
+    Member data is stored in a MySQL relational database.  The identifier field for the Member records are pre-loaded
+    to match with the <b>anonymous member id</b> field from the Claims data in order to show the claims data can
+    be enriched when member data is imported.  The import process utilizes
+    <a href="https://developer.marklogic.com/code/mlsam">MLSAM</a> to enable MarkLogic to get data from the MySQL
+    relational database.
+  </p>
+  <p>
+    The information stored in the Member table of the MySQL database can be previewed using the
+    <a href="./sql-explorer">SQL Sandbox</a>.
+  </p>
+  <p>
+    Each member record includes the following fields:
+    <ul>
+      <li>Id</li>
+      <li>First Name</li>
+      <li>Last Name</li>
+      <li>Address Line 1</li>
+      <li>City</li>
+      <li>State</li>
+      <li>Zipcode</li>
+      <li>Last Modified Date</li>
+    </ul>
+  </p>
+  <p>
+    <button type="button" class="btn btn-primary" ng-click="loadMemberData()">Load Member Data</button>
+    <span class="alert alert-info" role="alert" ng-if="model.memberData.loadRunning">{{model.memberData.status}}</span>
+    <span class="alert alert-success" role="alert" ng-if="model.memberData.loadSucceeded">{{model.memberData.status}}</span>
+    <span class="alert alert-danger" role="alert" ng-if="model.memberData.loadFailed">{{model.memberData.status}}</span>
+  </p>
+</div>
+<div class="row">
+  <hr/>
+  <h3>Geonames - Postal Code Data</h3>
+  <p>
+    The <a href="http://www.geonames.org/">Geonames</a> website provides a download of
+    <a href="http://download.geonames.org/export/zip/">US Postal Code Data</a>.  The download includes a
+    latitude/longitude centroid for each postal code.  The Geonames Postal Code data has been
+    stored in a table in a MySQL relational database.
+  </p>
+  <p>
+    The information stored in the <b>geonamesPostcode</b> table of the MySQL database can be previewed using the
+    <a href="./sql-explorer">SQL Sandbox</a>.
+  </p>
+  <p>
+    The Geonames Postal Code data is used to enrich the Member data as it is imported.  Each Member record includes
+    a <b>zipcode</b> field that is linked the <b>postalCode</b> field in the <b>geonamesPostcode</b> table.  This integration
+    is implemented using <a href="https://developer.marklogic.com/code/mlsam">MLSAM</a> to query the MySQL database
+    using the zipcode from each member record as it is being imported.  The latitude/longitude fields from the Geonames data
+     is added to the Member data.  With the Member data including geospatial information, member data and claims
+     data can be displayed/searched on a map.
+  </p>
+</div>
