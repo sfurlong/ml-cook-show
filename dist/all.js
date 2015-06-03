@@ -75,102 +75,6 @@ angular.module('sample', [
       });
   }]);
 
-// Copied from https://docs.angularjs.org/api/ng/service/$compile
-angular.module('sample.create')
-  .directive('compile', function($compile) {
-    'use strict';
-
-    // directive factory creates a link function
-    return function(scope, element, attrs) {
-      scope.$watch(
-        function(scope) {
-           // watch the 'compile' expression for changes
-          return scope.$eval(attrs.compile);
-        },
-        function(value) {
-          // when the 'compile' expression changes
-          // assign it into the current DOM
-          element.html(value);
-
-          // compile the new DOM and link it to the current
-          // scope.
-          // NOTE: we only compile .childNodes so that
-          // we don't get into infinite loop compiling ourselves
-          $compile(element.contents())(scope);
-        }
-      );
-    };
-  });
-
-(function () {
-  'use strict';
-
-  angular.module('sample.create')
-    .controller('CreateCtrl', ['$scope', 'MLRest', '$window', 'User', function ($scope, mlRest, win, user) {
-      var model = {
-        person: {
-          isActive: true,
-          balance: 0,
-          picture: 'http://placehold.it/32x32',
-          age: 0,
-          eyeColor: '',
-          name: '',
-          gender: '',
-          company: '',
-          email: '',
-          phone: '',
-          address: '',
-          about: '',
-          registered: '',
-          latitude: 0,
-          longitude: 0,
-          tags: [],
-          friends: [],
-          greeting: '',
-          favoriteFruit: ''
-        },
-        newTag: '',
-        user: user
-      };
-
-      angular.extend($scope, {
-        model: model,
-        editorOptions: {
-          height: '100px',
-          toolbarGroups: [
-            { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
-            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
-            { name: 'links' }
-          ],
-          //override default options
-          toolbar: '',
-          /* jshint camelcase: false */
-          toolbar_full: ''
-        },
-        submit: function() {
-          mlRest.createDocument($scope.model.person, {
-            format: 'json',
-            directory: '/content/',
-            extension: '.json'
-            // TODO: add read/update permissions here like this:
-            // 'perm:sample-role': 'read',
-            // 'perm:sample-role': 'update'
-          }).then(function(response) {
-            win.location.href = '/detail?uri=' + response.headers('location').replace(/(.*\?uri=)/, '');
-          });
-        },
-        addTag: function() {
-          model.person.tags.push(model.newTag);
-          model.newTag = '';
-        }
-      });
-    }]);
-}());
-
-
-angular.module('sample.create', []);
-
 (function () {
 
   'use strict';
@@ -347,6 +251,102 @@ angular.module('sample.common', [])
       });
     }]);
 }());
+
+// Copied from https://docs.angularjs.org/api/ng/service/$compile
+angular.module('sample.create')
+  .directive('compile', function($compile) {
+    'use strict';
+
+    // directive factory creates a link function
+    return function(scope, element, attrs) {
+      scope.$watch(
+        function(scope) {
+           // watch the 'compile' expression for changes
+          return scope.$eval(attrs.compile);
+        },
+        function(value) {
+          // when the 'compile' expression changes
+          // assign it into the current DOM
+          element.html(value);
+
+          // compile the new DOM and link it to the current
+          // scope.
+          // NOTE: we only compile .childNodes so that
+          // we don't get into infinite loop compiling ourselves
+          $compile(element.contents())(scope);
+        }
+      );
+    };
+  });
+
+(function () {
+  'use strict';
+
+  angular.module('sample.create')
+    .controller('CreateCtrl', ['$scope', 'MLRest', '$window', 'User', function ($scope, mlRest, win, user) {
+      var model = {
+        person: {
+          isActive: true,
+          balance: 0,
+          picture: 'http://placehold.it/32x32',
+          age: 0,
+          eyeColor: '',
+          name: '',
+          gender: '',
+          company: '',
+          email: '',
+          phone: '',
+          address: '',
+          about: '',
+          registered: '',
+          latitude: 0,
+          longitude: 0,
+          tags: [],
+          friends: [],
+          greeting: '',
+          favoriteFruit: ''
+        },
+        newTag: '',
+        user: user
+      };
+
+      angular.extend($scope, {
+        model: model,
+        editorOptions: {
+          height: '100px',
+          toolbarGroups: [
+            { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+            { name: 'links' }
+          ],
+          //override default options
+          toolbar: '',
+          /* jshint camelcase: false */
+          toolbar_full: ''
+        },
+        submit: function() {
+          mlRest.createDocument($scope.model.person, {
+            format: 'json',
+            directory: '/content/',
+            extension: '.json'
+            // TODO: add read/update permissions here like this:
+            // 'perm:sample-role': 'read',
+            // 'perm:sample-role': 'update'
+          }).then(function(response) {
+            win.location.href = '/detail?uri=' + response.headers('location').replace(/(.*\?uri=)/, '');
+          });
+        },
+        addTag: function() {
+          model.person.tags.push(model.newTag);
+          model.newTag = '';
+        }
+      });
+    }]);
+}());
+
+
+angular.module('sample.create', []);
 
 (function () {
   'use strict';

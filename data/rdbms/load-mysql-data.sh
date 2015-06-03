@@ -1,12 +1,12 @@
-/usr/local/mysql/bin/mysql -e "use test; \
---	delete from employee; \
+/usr/local/mysql/bin/mysql -u root -e "use test; \
+	delete from employee; \
 	insert into employee (firstname, lastname, id, addr1, city, state, zipcode, lastMod) \
 		values ( 'dave', 'grant', 1, '100 julie road', 'sanatoga', 'pa', '19464', '2015-02-24T09:01:02' ); \
 	insert into employee (firstname, lastname, id, addr1, city, state, zipcode, lastMod) \
 		values ( 'fred', 'flintstone', 2, '100 bedrock road', 'bedrock', 'no', '00000', '2014-12-24T11:01:02');"
 
-/usr/local/mysql/bin/mysql -e "use test; \
---	delete from member; \
+/usr/local/mysql/bin/mysql -u root -e "use test; \
+	delete from member; \
 	insert into member (firstname, lastname, id, addr1, city, state, zipcode, lastMod) values \
 		( 'Jane', 'Lynch', 'GEXMLOLWF5JJXOGA', '100 hollywood blvd', 'hollywood', 'ca', '90027', '2015-02-24T09:01:02' ), \
 		( 'Tom', 'Hanks', 'RECBEP3Z8ERDMK4C', '100 bedrock road', 'orlando', 'fl', '32805', '2014-12-24T11:01:02'), \
@@ -18,9 +18,9 @@
 		( 'Idris', 'Elba', 'UOIYUJUUVU+NY8NO', '45 7th st', 'new york city', 'ny', '10019', '2015-02-21T11:01:02'), \
 		( 'Bob', 'Barker', 'SWVQ+SNGIXTLYO4N', '9880 beverly hills drive', 'beverly hills', 'ca', '90210', '2014-05-01T11:01:02');"
 
-/usr/local/mysql/bin/mysql -e "use test; \
---	delete from geonamesPostcode;
-	LOAD DATA INFILE '/vagrant/data/geonames/postcode-US.txt'
+/usr/local/mysql/bin/mysql -u root -e "use test; \
+	delete from geonamesPostcode;
+	LOAD DATA INFILE '/Users/sfurlong/ML-Dev/ml-cook-show/data/geonames/postcode-US.txt'
 	into table geonamesPostcode
 		(countryCode, postalCode, placeName, adminName1, adminCode1, adminName2, adminCode2, adminName3, adminCode3,
 		latitude, longitude, accuracy);"

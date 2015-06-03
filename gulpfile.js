@@ -25,7 +25,7 @@ var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 
 var options = {
-  appPort: argv['app-port'] || 9050,
+  appPort: argv['app-port'] || 9099,
   mlHost: argv['ml-host'] || 'localhost',
   mlPort: argv['ml-port'] || '9040'
 };
